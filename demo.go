@@ -10,13 +10,6 @@ import (
 )
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	if p, ok := w.(http.Pusher); ok {
-		p.Push("/node_modules/todomvc-app-css/index.css", nil)
-		p.Push("/dist/bundle.js", nil)
-		p.Push("/node_modules/todomvc-common/base.js", nil)
-		p.Push("/learn.json", nil)
-	}
-
 	contents := map[string]string{
 		"css": "text/css",
 		"js": "text/js",
@@ -30,6 +23,25 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	file := "public/vanilla-es6"
 	if (r.URL.Path == "/") {
 		file += "/index.html"
+
+		if p, ok := w.(http.Pusher); ok {
+			err := p.Push("/node_modules/todomvc-app-css/index.css", nil)
+			if err != nil {
+				fmt.Println(err)
+			}
+			err = p.Push("/dist/bundle.js", nil)
+			if err != nil {
+				fmt.Println(err)
+			}
+			err = p.Push("/node_modules/todomvc-common/base.js", nil)
+			if err != nil {
+				fmt.Println(err)
+			}
+			err = p.Push("/learn.json", nil)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
 	} else {
 		file += r.URL.Path
 	}
