@@ -1,0 +1,80 @@
+HTTP/2 with Go 1.8
+GoLang Milano MeetUp
+16 Feb 2017
+
+Vincenzo (Wilk) Ferrari
+Software Engineer at Ibuildings
+github.com/wilk
+
+* Why revise HTTP?
+
+HTTP practically only allows one outstanding request per TCP connection.
+
+In the past, browsers have used multiple TCP connections to issue parallel requests: it’s both counter-productive and it’s fundamentally unfair.
+
+At the same time, the large number of requests means a lot of duplicated data “on the wire”.
+
+* What are the key differences to HTTP/1.x?
+
+At a high level, HTTP/2:
+
+- is binary, instead of textual
+- is fully multiplexed, instead of ordered and blocking
+- can therefore use one connection for parallelism
+- uses header compression to reduce overhead
+- allows servers to “push” responses proactively into client caches
+- fully compatible with HTTP/1.1
+
+* Why is HTTP/2 binary?
+
+Binary protocols are more efficient to parse, more compact “on the wire”, and most importantly, they are much less error-prone.
+
+For example, HTTP/1.1 defines four different ways to parse a message; in HTTP/2, there’s just one code path.
+
+* Why is HTTP/2 multiplexed?
+
+HTTP/1.x has a problem called “head-of-line blocking,” where effectively only one request can be outstanding on a connection at a time.
+
+Multiplexing addresses these problems by allowing multiple request and response messages to be in flight at the same time.
+
+This, in turn, allows a client to use just one connection per origin to load a page.
+
+* Why just one TCP connection?
+
+With HTTP/1, browsers open between four and eight connections per origin.
+
+Since many sites use multiple origins, this could mean that a single page load opens more than thirty connections.
+
+One application opening so many connections simultaneously breaks a lot of the assumptions that TCP was built upon.
+
+* What’s the benefit of Server Push?
+
+When a browser requests a page, the server sends the HTML in the response, and then needs to wait for the browser to parse the HTML and issue requests for all of the embedded assets before it can start sending the JavaScript, images and CSS.
+
+Server Push potentially allows the server to avoid this round trip of delay by “pushing” the responses it thinks the client will need into its cache.
+
+* Why do we need header compression?
+
+If you assume that a page has about 80 assets and each request has 1400 bytes of headers, it takes at least 7-8 round trips to get the headers out “on the wire.”
+
+In comparison, even mild compression on headers allows those requests to get onto the wire within one roundtrip – perhaps even one packet.
+
+This overhead is considerable, especially when you consider the impact upon mobile clients, which typically see round-trip latency of several hundred milliseconds, even under good conditions.
+
+* Does HTTP/2 require encryption?
+
+Nope.
+
+* HTTP/2 History
+
+.image img/http2-diagram.png
+
+* HTTP/2 Diagram
+
+.image img/http2.png 500 600
+
+* Demo time!
+
+* Credits
+
+.link https://http2.github.io/faq/ http2 F.A.Q.
